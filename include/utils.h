@@ -13,7 +13,7 @@ public:
     ~BAProblem() {
     }
     /// save results to ply pointcloud
-    map<int, vector<pair<int, int>>> getMeasurements();
+    map<int, vector<pair<double, double>>> getMeasurements();
     vector<Sophus::SE3d> getPoses();
     int get_num_frames();
     int get_num_points();
@@ -26,6 +26,6 @@ private:
     int num_parameters_;
     bool use_quaternions_;
 
-    map<int, vector<pair<int, int>>> measurements_;
+    map<int, vector<pair<double, double>>> measurements_;
     vector<Sophus::SE3d> poses_;
 };
