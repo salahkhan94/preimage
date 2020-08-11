@@ -18,9 +18,11 @@ BAProblem::BAProblem(const std::string path):
     }
     infile.close();
     double w,x,y,z;
+
     Eigen::Quaterniond qt(0.5, 0.5, 0.5, 0.5);
     Eigen::Vector3d tt(0,0,0);
     Sophus::SE3d T(qt, tt);
+
     for(int i = 0; i<num_frames_; i++) {
         filename = path + "/Pose/" + std::to_string(i) + "_2.txt";
         infile.open(filename);
@@ -36,6 +38,7 @@ BAProblem::BAProblem(const std::string path):
         //cout  << x << " " << y << " " << z << endl;
         Eigen::Vector3d t(x, y, z);
         quat =  quat * qt;
+        quat.normalize();
         t = -1 * (quat.inverse() * t);
         Sophus::SE3d pose(quat,t);
         cout<<"quaternion " << i<<endl; 

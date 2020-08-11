@@ -32,8 +32,8 @@ using namespace std;
 using namespace cv;
 
 
-Point2f pixel2cam(const Point2d &p, const Mat &K) {
-  return Point2f
+Point2d pixel2cam(const Point2d &p, const Mat &K) {
+  return Point2d
     (
       (p.x - K.at<double>(0, 2)) / K.at<double>(0, 0),
       (p.y - K.at<double>(1, 2)) / K.at<double>(1, 1)
@@ -43,7 +43,7 @@ Point2f pixel2cam(const Point2d &p, const Mat &K) {
 
 void triangulate(map<int, std::vector<std::pair<double, double>>> pixel_me, 
                                 vector<Sophus::SE3d> poses, const Mat &K) {
-    vector<Point2f> pts_1, pts_2, pts_3, pts_4;
+    vector<Point2d> pts_1, pts_2, pts_3, pts_4;
     int i1 = 0,i2 = 1,i3 = 1,i4 = 2;
 
     auto R1 = poses[i1].rotationMatrix();
@@ -56,7 +56,7 @@ void triangulate(map<int, std::vector<std::pair<double, double>>> pixel_me,
     auto t3 = poses[i3].translation();
     auto t4 = poses[i4].translation();
 
-    Mat T1 = (Mat_<float>(3, 4) <<
+    Mat T1 = (Mat_<double>(3, 4) <<
         R1(0, 0), R1(0, 1), R1(0, 2), t1(0, 0),
         R1(1, 0), R1(1, 1), R1(1, 2), t1(1, 0),
         R1(2, 0), R1(2, 1), R1(2, 2), t1(2, 0));
@@ -64,7 +64,7 @@ void triangulate(map<int, std::vector<std::pair<double, double>>> pixel_me,
     cout << "T1 : " << endl;
     cout << T1 <<endl;
     
-    Mat T2 = (Mat_<float>(3, 4) <<
+    Mat T2 = (Mat_<double>(3, 4) <<
         R2(0, 0), R2(0, 1), R2(0, 2), t2(0, 0),
         R2(1, 0), R2(1, 1), R2(1, 2), t2(1, 0),
         R2(2, 0), R2(2, 1), R2(2, 2), t2(2, 0));
@@ -72,14 +72,14 @@ void triangulate(map<int, std::vector<std::pair<double, double>>> pixel_me,
     cout << "T2 : " << endl;
     cout << T2 <<endl;    
     
-    Mat T3 = (Mat_<float>(3, 4) <<
+    Mat T3 = (Mat_<double>(3, 4) <<
         R3(0, 0), R3(0, 1), R3(0, 2), t3(0, 0),
         R3(1, 0), R3(1, 1), R3(1, 2), t3(1, 0),
         R3(2, 0), R3(2, 1), R3(2, 2), t3(2, 0));
     cout << "T3 : " << endl;
     cout << T3 <<endl;
 
-    Mat T4 = (Mat_<float>(3, 4) <<
+    Mat T4 = (Mat_<double>(3, 4) <<
         R4(0, 0), R4(0, 1), R4(0, 2), t4(0, 0),
         R4(1, 0), R4(1, 1), R4(1, 2), t4(1, 0),
         R4(2, 0), R4(2, 1), R4(2, 2), t4(2, 0));
@@ -98,9 +98,9 @@ void triangulate(map<int, std::vector<std::pair<double, double>>> pixel_me,
 
     for(int i = 0; i<4; i++) {
         Mat x = pts_4d.col(i);
-        x /= x.at<float>(3, 0);
+        x /= x.at<double>(3, 0);
         cout<<"Point : "<<i<<endl;
-        cout<<x.at<float>(0,0) << " "<< x.at<float>(1,0) << " "<< x.at<float>(2,0) << " "<<endl;
+        cout<<x.at<double>(0,0) << " "<< x.at<double>(1,0) << " "<< x.at<double>(2,0) << " "<<endl;
     }
 
     for(int i = 0; i<4;i++) {
@@ -115,9 +115,9 @@ void triangulate(map<int, std::vector<std::pair<double, double>>> pixel_me,
     
     for(int i = 0; i<4; i++) {
         Mat x = a.col(i);
-        x /= x.at<float>(3, 0);
+        x /= x.at<double>(3, 0);
         cout<<"Point : "<<i<<endl;
-        cout<<x.at<float>(0,0) << " "<< x.at<float>(1,0) << " "<< x.at<float>(2,0) << " "<<endl;
+        cout<<x.at<double>(0,0) << " "<< x.at<double>(1,0) << " "<< x.at<double>(2,0) << " "<<endl;
     }
 
 }
@@ -150,10 +150,10 @@ int main(int argc, const char* argv[]){
    
     double f = 128.0;
     Vector2d principal_point(128.0, 72.0);
-    Mat K = (Mat_<double>(3, 3) << f, 0, 128, 0, f, 72, 0, 0, 1);
+    Mat K = (Mat_<double>(3, 3) << 128.0, 0, 128.0, 0, 128.0, 72.0, 0, 0, 1.0);
 
     triangulate(measurements, poses, K);
-/*    vector<g2o::SE3Quat,
+    /*vector<g2o::SE3Quat,
         aligned_allocator<g2o::SE3Quat> > true_poses;
     g2o::CameraParameters * cam_params
         = new g2o::CameraParameters (f, principal_point, 0.);
@@ -198,7 +198,7 @@ int main(int argc, const char* argv[]){
             = new g2o::VertexSE3Expmap();
         v_se3->setId(vertex_id);
         v_se3->setEstimate(pose);
-        v_se3->setFixed(true);
+        //v_se3->setFixed(true);
         cout << v_se3->estimate() << endl;
         optimizer.addVertex(v_se3);
         vertex_pose_intrinsics.push_back(v_se3);
