@@ -1,6 +1,5 @@
 #include <iostream>
 #include <stdint.h>
-
 #include <unordered_set>
 
 #include "g2o/core/sparse_optimizer.h"
@@ -35,7 +34,7 @@ int main(int argc, const char* argv[]){
     auto measurements = ba.getMeasurements();
     auto poses = ba.getPoses();
 
-    num_points = 4;
+    //num_points = 4;
 
     g2o::SparseOptimizer optimizer;
     optimizer.setVerbose(false);
