@@ -153,7 +153,7 @@ int main(int argc, const char* argv[]){
     Mat K = (Mat_<double>(3, 3) << f, 0, 128, 0, f, 72, 0, 0, 1);
 
     triangulate(measurements, poses, K);
-/*    vector<g2o::SE3Quat,
+    vector<g2o::SE3Quat,
         aligned_allocator<g2o::SE3Quat> > true_poses;
     g2o::CameraParameters * cam_params
         = new g2o::CameraParameters (f, principal_point, 0.);
@@ -218,6 +218,7 @@ int main(int argc, const char* argv[]){
         v_p->setId(point_id);
         v_p->setMarginalized(true);
         v_p->setEstimate(init_points.at(i));
+        cout << "point " << i <<endl;
         cout << v_p->estimate() << endl;
         optimizer.addVertex(v_p);
         vertex_points.push_back(v_p);
@@ -237,7 +238,11 @@ int main(int argc, const char* argv[]){
             edge->setInformation(Matrix2d::Identity());
             edge->setRobustKernel(new g2o::RobustKernelHuber());
             edge->setParameterId(0,0);
+            cout<<"frameid : " << fr_id << endl;
+            cout<<"pointid : " << pt_id <<endl;
+            cout << "Measurement : " << endl;
             cout<< edge->measurement() << endl;
+            edge->setParameterId(0, 0);
             optimizer.addEdge(edge);
         }
         pt_id++;
@@ -260,5 +265,5 @@ int main(int argc, const char* argv[]){
        cout << "x : " << pt.x() << " y : " 
             << pt.y() << " z : " << pt.z() << endl;
     }
-    */
+    
 }
