@@ -5,7 +5,6 @@
 #include <vector>
 #include <ceres/ceres.h>
 
-
 using ceres::AutoDiffCostFunction;
 using ceres::CostFunction;
 using ceres::Problem;
@@ -50,14 +49,16 @@ Eigen::Vector3d Triangulate(std::vector<std::pair
     <Eigen::Matrix<double, 3, 4>,Eigen::Vector2d>> datas) {
         Eigen::Vector4d x;
         x << 0,0,0,1;
+
         ceres::Problem problem;
         ceres::Solver::Options options;
-        ceres::LossFunction* loss= nullptr;
         ceres::Solver::Summary summary;
 
         for(auto data:datas) {
+            ceres::LossFunction* loss= nullptr;
             problem.AddResidualBlock(ReprojectionError::Create(data.first,data.second),loss,&x[0]);
         }
+
         ceres::Solve(options,&problem, &summary);
         std::cout << summary.FullReport() << "\n";
         return x.hnormalized();
@@ -76,7 +77,7 @@ int main(int argc, char** argv) {
     Eigen::Matrix<double, 3, 3> K;
     K << f, 0, 128, 0, f, 72, 0, 0, 1;
     num_points = 1;
-    num_frames = 10;
+    num_frames = 9;
     std::vector<std::pair
     <Eigen::Matrix<double, 3, 4>,Eigen::Vector2d>> datas;
     for(size_t i = 0; i<num_points; ++i) {
@@ -91,6 +92,19 @@ int main(int argc, char** argv) {
                     R(2, 0), R(2, 1), R(2, 2), t(2, 0);
             
                 auto P = K * T;
+
+                Eigen::Vector4d x;
+                x << -0.332204,-6.99158,2.23257,1;
+                auto proj3d = (P * x);
+                
+                cout << " True 2d point : "  << endl;
+                cout << pt2d << endl;
+                cout << " Projected 2d : " << endl;
+                cout << proj3d.hnormalized() <<endl;
+                cout << " Raw projected " << endl;
+                cout << proj3d << endl;
+                cout << endl;
+                
                 std::pair<Eigen::Matrix<double, 3, 4>,Eigen::Vector2d> d;
                 d.first = P;
                 d.second = pt2d;
