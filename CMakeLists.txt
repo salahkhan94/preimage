@@ -14,6 +14,7 @@ find_package(G2O REQUIRED)
 find_package(Sophus REQUIRED)
 Find_Package(Eigen3 REQUIRED)
 Find_Package(CSparse REQUIRED)
+Find_Package(Ceres REQUIRED)
 find_package(OpenCV 3 REQUIRED)
 
 LIST(APPEND G2O_LIBS
@@ -44,3 +45,5 @@ target_link_libraries(triangulate ${G2O_LIBS} ${OpenCV_LIBS} utils)
 add_executable(ba src/g2o_bundle_adjustment.cpp)
 target_link_libraries(ba ${G2O_LIBS} ${OpenCV_LIBS} utils)
 
+add_executable(nonlin_triangulation src/nonlinear_triangulation.cpp)
+target_link_libraries(nonlin_triangulation ${CERES_LIBRARIES} ${OpenCV_LIBS} utils)

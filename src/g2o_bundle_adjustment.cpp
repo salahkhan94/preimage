@@ -19,28 +19,42 @@
 using namespace Eigen;
 using namespace std;
 
-class Sample {
- public:
-  static int uniform(int from, int to) { return static_cast<int>(g2o::Sampler::uniformRand(from, to)); }
-};
-
 int main(int argc, const char* argv[]){
-  
-
+    
     BAProblem ba("/home/tsa/practice/slambook2/preimage/PreImage-taskdata/data");
     cout << "BA Problem created" << endl;
-    int num_frames = ba.get_num_frames();
-    int num_points = ba.get_num_points();
+    unsigned int num_frames = ba.get_num_frames();
+    unsigned int num_points = ba.get_num_points();
     auto measurements = ba.getMeasurements();
     auto poses = ba.getPoses();
 
     //num_points = 4;
 
     g2o::SparseOptimizer optimizer;
-    optimizer.setVerbose(false);
-    bool DENSE = 0;
-    bool STRUCTURE_ONLY = 0;
-    bool ROBUST_KERNEL = 0;
+    optimizer.setVerbose(true);
+    
+    num_points = min((int)num_points,atoi(argv[1]));
+    num_frames = min((int)num_frames,atoi(argv[2]));
+    bool POSES_FIXED = false;
+    if (argc>3){
+        POSES_FIXED = atoi(argv[3]) != 0;
+    }
+
+    bool ROBUST_KERNEL = false;
+    if (argc>4){
+        ROBUST_KERNEL = atoi(argv[4]) != 0;
+    }
+
+    bool STRUCTURE_ONLY = false;
+    if (argc>5){
+        STRUCTURE_ONLY = atoi(argv[5]) != 0;
+    }
+
+    bool DENSE = false;
+    if (argc>6){
+        DENSE = atoi(argv[6]) != 0;
+    }
+
     std::unique_ptr<g2o::BlockSolver_6_3::LinearSolverType> linearSolver;
     if (DENSE) {
         linearSolver = g2o::make_unique<g2o::LinearSolverDense<g2o::BlockSolver_6_3::PoseMatrixType>>();
@@ -85,10 +99,10 @@ int main(int argc, const char* argv[]){
         double z = 1;
         double x = (u - principal_point.x()) * z / focal_length;
         double y = (v - principal_point.y()) * z / focal_length; 
-    
+        Vector3d pt(-1,-1,-1);
         Vector3d point(x,y,z);
         point = T.inverse() * point;
-        init_points.push_back(point);
+        init_points.push_back(pt);
     }
 
     
@@ -112,8 +126,11 @@ int main(int argc, const char* argv[]){
 
         v_se3->setId(vertex_id);
         v_se3->setEstimate(pose);
-        v_se3->setFixed(false);
-
+        if(POSES_FIXED) v_se3->setFixed(true);
+        else v_se3->setFixed(false);
+        if (i<9) {
+            v_se3->setFixed(true);
+        }
         cout << v_se3->estimate() << endl;
         
         optimizer.addVertex(v_se3);
@@ -178,7 +195,9 @@ int main(int argc, const char* argv[]){
                 e->setMeasurement(z);
                 cout << "Measurement : " << endl;
                 cout<< e->measurement() << endl;
+                if(i!=5)
                 e->information() = Matrix2d::Identity();
+                else e->information() = Matrix2d::Identity();
                 if (ROBUST_KERNEL) {
                     g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
                     e->setRobustKernel(rk);
@@ -209,7 +228,11 @@ int main(int argc, const char* argv[]){
     cout << endl;
 
     for(size_t i=0; i<vertex_points.size();i++) {
-        cout << "Point " << i <<endl;
+        cout << "Point " << i+1 <<endl;
         cout << vertex_points[i]->estimate() <<endl;
+    }
+    for(size_t i=0; i<true_poses.size();i++) {
+        cout << "Pose " << i+1 <<endl;
+        cout << vertex_poses[i]->estimate() <<endl;
     }
 }
