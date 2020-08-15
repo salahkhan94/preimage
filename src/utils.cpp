@@ -38,11 +38,11 @@ BAProblem::BAProblem(const std::string path):
         quat =  quat * qt;
         t = -1 * (quat.toRotationMatrix().inverse() * t);
         Sophus::SE3d pose(quat,t);
-        cout<<"quaternion " << i<<endl; 
-        cout<< quat.x() << " " << quat.y() <<" " << quat.z()<< " " << quat.w()<<endl;
-        cout<<"translation " <<i <<endl;
-        cout<< t.x() << " " << t.y() <<" " << t.z()<<endl;
-        cout<<endl;
+//        cout<<"quaternion " << i<<endl; 
+//        cout<< quat.x() << " " << quat.y() <<" " << quat.z()<< " " << quat.w()<<endl;
+//        cout<<"translation " <<i <<endl;
+//        cout<< t.x() << " " << t.y() <<" " << t.z()<<endl;
+//        cout<<endl;
         poses_.push_back(pose);
         infile.close();
     }
