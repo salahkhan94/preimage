@@ -13,7 +13,7 @@ using ceres::Solve;
 using ceres::Solver;
 
 class ReprojectionError {
-  using mat =  Eigen::Matrix<double, 3, 8>;
+ using mat =  Eigen::Matrix<double, 3, 8>;
  public:
     ReprojectionError(
             const Eigen::Matrix<double, 3, 4>& projection_matrix,
@@ -26,7 +26,7 @@ class ReprojectionError {
     template <typename T>
     bool operator()(const T* cube_params, T* reprojection_error) const {
 
-            //if(cube_params[3] < T(0)) return false;
+           // if(cube_params[3] < T(5)) return false;
 
             const Eigen::Matrix<T, 3, 8> coods = getCoods(cube_params);
             const Eigen::Matrix<double, 3, 3> R(projection_matrix_.block<3,3>(0,0));
@@ -92,7 +92,7 @@ Eigen::Matrix<double, 3, 8> getCoods(const double* cube_params) {
 
 Eigen::Matrix<double, 3, 8> Triangulate(std::vector<std::pair
     <Eigen::Matrix<double, 3, 4>,Eigen::Matrix<double, 2, 8>>> datas) {
-        double cube_params[4] = {1, 1, 0, 1};
+        double cube_params[4] = {1, 1, 0, 10};
         ceres::Problem problem;
         ceres::Solver::Options options;
         ceres::LossFunction* loss= nullptr;//new ceres::CauchyLoss(0.5);
@@ -103,6 +103,10 @@ Eigen::Matrix<double, 3, 8> Triangulate(std::vector<std::pair
         }
         ceres::Solve(options,&problem, &summary);
         std::cout << summary.FullReport() << "\n";
+        for(auto &n : cube_params) {
+            std::cout << n << " ";
+        }
+        std::cout << std::endl;
         return getCoods(cube_params);
 } 
 
@@ -121,6 +125,9 @@ int main(int argc, char** argv) {
 
     Eigen::Matrix<double, 3, 3> K;
     K << f, 0, 128, 0, f, 72, 0, 0, 1;
+
+    cout << K << endl;
+
     num_points = 8;
     num_frames = 10;
     

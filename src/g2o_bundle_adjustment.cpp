@@ -99,7 +99,7 @@ int main(int argc, const char* argv[]){
         double z = 1;
         double x = (u - principal_point.x()) * z / focal_length;
         double y = (v - principal_point.y()) * z / focal_length; 
-        Vector3d pt(-1,-1,-1);
+        Vector3d pt(2.00653,5.39015,-0.505369);
         Vector3d point(x,y,z);
         point = T.inverse() * point;
         init_points.push_back(pt);
@@ -128,9 +128,9 @@ int main(int argc, const char* argv[]){
         v_se3->setEstimate(pose);
         if(POSES_FIXED) v_se3->setFixed(true);
         else v_se3->setFixed(false);
-        if (i<9) {
-            v_se3->setFixed(true);
-        }
+        // if (i<9) {
+        //     v_se3->setFixed(true);
+        // }
         cout << v_se3->estimate() << endl;
         
         optimizer.addVertex(v_se3);
