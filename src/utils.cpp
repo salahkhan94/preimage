@@ -1,7 +1,7 @@
 #include "utils.h"
 
 BAProblem::BAProblem(const std::string path):
-    num_frames_(6), num_points_(8) {
+    num_frames_(10), num_points_(8) {
     std::cout << "BA Problem constructor" << endl;
     num_observations_ = num_frames_* num_points_;
     std::ifstream infile;
@@ -38,14 +38,13 @@ BAProblem::BAProblem(const std::string path):
         //cout  << x << " " << y << " " << z << endl;
         Eigen::Vector3d t(x, y, z);
         quat =  quat * qt;
-        quat.normalize();
-        t = -1 * (quat.inverse() * t);
+        t = -1 * (quat.toRotationMatrix().inverse() * t);
         Sophus::SE3d pose(quat,t);
-        cout<<"quaternion " << i<<endl; 
-        cout<< quat.x() << " " << quat.y() <<" " << quat.z()<< " " << quat.w()<<endl;
-        cout<<"translation " <<i <<endl;
-        cout<< t.x() << " " << t.y() <<" " << t.z()<<endl;
-        cout<<endl;
+//        cout<<"quaternion " << i<<endl; 
+//        cout<< quat.x() << " " << quat.y() <<" " << quat.z()<< " " << quat.w()<<endl;
+//        cout<<"translation " <<i <<endl;
+//        cout<< t.x() << " " << t.y() <<" " << t.z()<<endl;
+//        cout<<endl;
         poses_.push_back(pose);
         infile.close();
     }
