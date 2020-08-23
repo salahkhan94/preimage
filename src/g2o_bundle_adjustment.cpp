@@ -21,7 +21,7 @@ using namespace std;
 
 int main(int argc, const char* argv[]){
     
-    BAProblem ba("/home/tsa/practice/slambook2/preimage/PreImage-taskdata/data");
+    BAProblem ba("/home/tsa/practice/preimage/PreImage-taskdata/data");
     cout << "BA Problem created" << endl;
     unsigned int num_frames = ba.get_num_frames();
     unsigned int num_points = ba.get_num_points();

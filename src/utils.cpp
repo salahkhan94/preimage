@@ -18,8 +18,7 @@ BAProblem::BAProblem(const std::string path):
     }
     infile.close();
     double w,x,y,z;
-
-    Eigen::Quaterniond qt(0.5, 0.5, 0.5, 0.5);
+    Eigen::Quaterniond qt(0.5, 0.5, 0.5, 0.5); // Rotation from Camera-Base frame to Optical Frame
     Eigen::Vector3d tt(0,0,0);
     Sophus::SE3d T(qt, tt);
 
@@ -30,21 +29,25 @@ BAProblem::BAProblem(const std::string path):
         infile >> x;
         infile >> y;
         infile >> z;
-        //cout << w << " " << x << " "<< y << " " << z << endl;
         Eigen::Quaterniond quat(w,x,y,z);
         infile >> x;
         infile >> y;
         infile >> z;
-        //cout  << x << " " << y << " " << z << endl;
+
         Eigen::Vector3d t(x, y, z);
+        //Rotate the camera-base frame and estimate the orientation of the optical frame
         quat =  quat * qt;
+        //Calculate SE3 element of translation. 
         t = -1 * (quat.toRotationMatrix().inverse() * t);
+        quat = quat.inverse();
+        //Rigid Body transform from NED to Optical frame i
         Sophus::SE3d pose(quat,t);
-//        cout<<"quaternion " << i<<endl; 
-//        cout<< quat.x() << " " << quat.y() <<" " << quat.z()<< " " << quat.w()<<endl;
-//        cout<<"translation " <<i <<endl;
-//        cout<< t.x() << " " << t.y() <<" " << t.z()<<endl;
-//        cout<<endl;
+        
+        // cout<<"quaternion " << i<<endl; 
+        // cout<< quat.x() << " " << quat.y() <<" " << quat.z()<< " " << quat.w()<<endl;
+        // cout<<"translation " <<i <<endl;
+        // cout<< t[0] << " " << t[1] <<" " << t[2]<<endl;
+        // cout<<endl;
         poses_.push_back(pose);
         infile.close();
     }
