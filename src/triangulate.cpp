@@ -16,7 +16,7 @@ using namespace Eigen;
 using namespace std;
 using namespace cv;
 
-
+/* DLT triangulation method*/
 
 void triangulate(map<int, std::vector<std::pair<double, double>>> pixel_me, 
                                 vector<Sophus::SE3d> poses, const Mat &K, unsigned int nframes, unsigned int npoints) {
@@ -83,5 +83,4 @@ int main(int argc, const char* argv[]){
     Mat K = (Mat_<double>(3, 3) << f, 0, 128, 0, f, 72, 0, 0, 1);
 
     triangulate(measurements, poses, K, num_frames, num_points);
-    
 }
